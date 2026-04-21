@@ -77,6 +77,43 @@ Nothing is cached — `build.rb` re-reads the markdown, re-highlights every
 source file, recompiles the SCSS, and writes a fresh HTML file each run. A
 rebuild on the sample takes well under a second.
 
+### Authoring from Obsidian
+
+Obsidian is great for the prose half — live preview, wiki-links, outline
+view — but it won't open `.py` / `.yaml` / `.rb` files natively, so you need
+a second editor open on the source. The workflow that works well:
+
+1. **Put this repo (or a fork of it) inside your Obsidian vault** as a
+   regular folder. Obsidian will index `codetalk-1.md` and any other `.md`
+   files you add; it ignores the `_code/` directory's non-markdown contents
+   by default.
+2. **Open `codetalk-1.md` in Obsidian.** Use live preview or edit mode —
+   doesn't matter, the codetalk headings (`## file.py`, `### Lines 10-25`)
+   are just regular markdown to Obsidian.
+3. **Open the source file in a second editor side by side.** VS Code, a
+   terminal editor, or even `Preview` works — you just need line numbers
+   visible so you can pick ranges for `### Lines N-M`. Arrange the two
+   windows side by side: Obsidian on one half, code editor on the other.
+4. **When you change the prose, save the `.md` in Obsidian**, then run
+   `bundle exec ruby build.rb codetalk-1.md` in a terminal and refresh the
+   browser.
+5. **Optional: Obsidian "Shell commands" plugin.** Bind `build.rb` to a
+   hotkey so Cmd-B (or whatever) runs the build without switching to the
+   terminal. Command template:
+
+   ```
+   cd "{{vault_path}}/codetalk" && bundle exec ruby build.rb "{{file_path}}"
+   ```
+
+   where `codetalk` is this repo's folder inside your vault.
+
+Why you need the second editor: Obsidian is a markdown-first tool and
+deliberately doesn't do syntax highlighting for standalone code files. The
+codetalk source files (`_code/codetalk-1/*.py`, etc.) are kept on disk as
+plain text, not inside the markdown, precisely so another editor can open
+them — and so the markdown stays readable (front matter + prose only, no
+giant code blocks inline).
+
 ### Authoring syntax cheat sheet
 
 - **`scripts:` front matter** — list of files to pin. Paths are resolved
