@@ -1,11 +1,80 @@
 # codetalk
 
+![codetalk example — two-column layout: file card on the left, narrative prose on the right, active lines spotlighted](docs/hero.png)
+
 Pin source files alongside markdown prose. As the reader scrolls, the code
 pane spotlights the lines being discussed. Useful for walking humans (or AI
 agents) through a codebase one region at a time.
 
 A Jekyll plugin plus a small standalone demo build. Drop it into a static
 site, or use this repo as a template for standalone annotated code pages.
+
+## Anatomy of the screenshot
+
+The image above shows the default codetalk layout:
+
+- **Top of the page, full width** — the page title (`Mapping the Spaceship
+  Design Space`) and the **preamble**: any prose that sits above the first
+  `### Lines` heading. Regular body text, one or two paragraphs, sets up
+  what the reader is about to see.
+- **Left column, dark card** — the **code pane**. A file-tab strip along
+  the top (two tabs in this example, `spaceship-region.py` and
+  `plot-config.yaml`; clicking a tab swaps what's shown). Below the tabs,
+  the source with line numbers. The currently-active range has a soft
+  yellow highlight; everything else is dimmed to ~20% opacity. Scrolling
+  inside the pane changes which range is active.
+- **Right column, body text** — the **prose pane**. Shows exactly one
+  step's annotation at a time, vertically positioned to line up with the
+  highlighted range on the left. As the reader scrolls the code, the
+  prose cross-fades to the next step.
+
+The step shown in the screenshot (lines 7–15 of `spaceship-region.py`, the
+`SPACE_STATIONS` array) comes from this markdown in
+[`codetalk-1.md`](codetalk-1.md):
+
+~~~markdown
+---
+title: "Mapping the Spaceship Design Space"
+scripts:
+  - file: codetalk-1/spaceship-region.py
+    label: spaceship-region.py
+  - file: codetalk-1/plot-config.yaml
+    label: plot-config.yaml
+---
+
+## spaceship-region.py
+
+This script builds a scatter plot mapping the design space for crewed spacecraft and
+space stations. Starting from real historical data — Salyut, Skylab, Mir, the ISS —
+it adds hypothetical designs and carves the resulting landscape into regions, making
+a visual case for what an ideal long-duration spacecraft might look like.
+
+### Lines 7-15
+
+Every entry in `SPACE_STATIONS` carries the same shape: total volume, pressurised
+volume, habitable volume, crew size, and two boolean flags — `is_real` and
+`has_gravity`. The real historical stations anchor the chart. Salyut-1 gave three
+cosmonauts just 30 m³ each; the ISS, humanity's largest off-world structure, still
+only offers about 55 m³ per person. These numbers set the baseline for everything
+that follows.
+~~~
+
+A few things to notice in that snippet:
+
+- `scripts:` in the front matter is the full list of files pinned to the
+  page. Paths are relative to `_code/`.
+- The paragraph right under `## spaceship-region.py` (before any `###
+  Lines` heading) is the **preamble** — it renders above the grid, not
+  beside a specific line range.
+- `### Lines 7-15` creates one **step**. The heading's range (`7-15`)
+  becomes the `data-start="7" data-end="15"` on the rendered step and is
+  what the scroll spotlight tracks.
+- Everything between `### Lines 7-15` and the next `###` (or the next
+  `##`, or the end of the file) is that step's annotation.
+
+The full sample file has four steps on `spaceship-region.py` and two on
+`plot-config.yaml` — open [`codetalk-1.md`](codetalk-1.md) to see the
+whole thing, or `open index.html` to watch it in action.
 
 ## Quickstart (standalone, no Jekyll)
 
