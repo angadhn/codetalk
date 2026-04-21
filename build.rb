@@ -15,12 +15,29 @@ require 'sass-embedded'
 
 require_relative 'codetalk'
 
-ROOT        = __dir__
-SOURCE_MD   = File.join(ROOT, 'codetalk-1.md')
-CODE_DIR    = File.join(ROOT, '_code')
-SCSS_PATH   = File.join(ROOT, '_codetalk.scss')
-JS_PATH     = File.join(ROOT, 'codetalk.js')
-OUTPUT_HTML = File.join(ROOT, 'index.html')
+ROOT      = __dir__
+CODE_DIR  = File.join(ROOT, '_code')
+SCSS_PATH = File.join(ROOT, '_codetalk.scss')
+JS_PATH   = File.join(ROOT, 'codetalk.js')
+
+# Usage:
+#   bundle exec ruby build.rb                   # defaults to codetalk-1.md -> index.html
+#   bundle exec ruby build.rb my-walkthrough.md # writes my-walkthrough.html
+#   bundle exec ruby build.rb foo.md out.html   # explicit output path
+arg_md  = ARGV[0] || 'codetalk-1.md'
+arg_out = ARGV[1]
+
+SOURCE_MD = File.expand_path(arg_md, ROOT)
+
+# Default behaviour: codetalk-1.md -> index.html (so the committed standalone
+# demo stays at index.html for forkers). Any other input gets a matching .html
+# beside it; an explicit second argument wins.
+default_out = if arg_md == 'codetalk-1.md'
+                'index.html'
+              else
+                File.basename(arg_md, '.md') + '.html'
+              end
+OUTPUT_HTML = File.expand_path(arg_out || default_out, ROOT)
 
 abort("Missing source markdown: #{SOURCE_MD}") unless File.exist?(SOURCE_MD)
 

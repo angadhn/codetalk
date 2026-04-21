@@ -50,18 +50,32 @@ Then make your own:
    Second step.
    ```
 
-3. **Update `build.rb`** — change the `SOURCE_MD` constant at the top from
-   `codetalk-1.md` to `myproject.md`.
-4. **Rebuild.**
+3. **Build.** `build.rb` takes the source markdown as its first argument and
+   writes a matching `.html` beside it:
 
    ```bash
-   bundle install            # one-time; pulls rouge, kramdown, sass-embedded
-   bundle exec ruby build.rb # writes index.html
-   open index.html
+   bundle install                         # one-time; pulls rouge, kramdown, sass-embedded
+   bundle exec ruby build.rb myproject.md # writes myproject.html
+   open myproject.html
    ```
 
-That's the whole loop. Edit prose or code, re-run `build.rb`, refresh the
-browser.
+   With no arguments it rebuilds the sample: `codetalk-1.md` → `index.html`.
+
+### Edit / rebuild loop
+
+Once the initial build works, the inner loop is two commands:
+
+```bash
+# edit any of:
+#   myproject.md            ← the prose and line ranges
+#   _code/myproject/*.py    ← the source being annotated
+bundle exec ruby build.rb myproject.md
+# then refresh the browser (Cmd-R / Ctrl-R)
+```
+
+Nothing is cached — `build.rb` re-reads the markdown, re-highlights every
+source file, recompiles the SCSS, and writes a fresh HTML file each run. A
+rebuild on the sample takes well under a second.
 
 ### Authoring syntax cheat sheet
 
