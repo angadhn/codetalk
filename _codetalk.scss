@@ -1,0 +1,582 @@
+/* ── Codetalk layout ──────────────────────────────────────────────── */
+
+.codetalk {
+  display: grid;
+  grid-template-columns: 55% 1fr;
+  gap: 2rem;
+  width: 140%;
+  max-width: none;
+  margin-right: -40%;
+  height: 70vh;
+  min-height: 0;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  position: relative;
+  z-index: 1;
+
+  // Spotlight overlay — soft rectangular vignette via CSS mask
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    -webkit-mask-image:
+      linear-gradient(to right,
+        black 0%, transparent 22%, transparent 94%, black 100%),
+      linear-gradient(to bottom,
+        black 0%, transparent 15%, transparent 88%, black 100%);
+    -webkit-mask-composite: source-over;
+    mask-image:
+      linear-gradient(to right,
+        black 0%, transparent 22%, transparent 94%, black 100%),
+      linear-gradient(to bottom,
+        black 0%, transparent 15%, transparent 88%, black 100%);
+    mask-composite: add;
+    opacity: var(--spotlight, 0);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &--spotlighting {
+    z-index: 10;
+
+    .codetalk__preamble {
+      p, ul, ol { color: hsl(0, 0%, 20%); }
+    }
+  }
+}
+
+/* ── Code area (wraps tabs + code panes) ──────────────────────────── */
+
+.codetalk__code-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* ── File tabs (shown when multiple files) ────────────────────────── */
+
+.codetalk__file-tabs {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid hsl(0, 0%, 25%);
+  background: #181c22;
+  border-radius: 10px 10px 0 0;
+}
+
+.codetalk__file-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1.1rem;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.75rem;
+  color: hsl(0, 0%, 55%);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    color: hsl(0, 0%, 75%);
+  }
+
+  &--active {
+    color: hsl(0, 0%, 85%);
+    border-bottom-color: hsl(210, 60%, 55%);
+    background: #1f232b;
+  }
+}
+
+/* ── Code pane (left, scrollable — the primary interaction) ───────── */
+
+.codetalk__code {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  background: #1f232b;
+  display: flex;
+  flex-direction: column;
+
+  .codetalk__file-tabs ~ & {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+.codetalk__code--hidden {
+  display: none;
+}
+
+.codetalk__code-header {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.75rem;
+  color: hsl(0, 0%, 55%);
+  border-bottom: 1px solid hsl(0, 0%, 25%);
+  flex-shrink: 0;
+}
+
+img.codetalk__file-icon {
+  display: inline-block;
+  height: 1.4em;
+  width: auto;
+  margin-right: 0.35em;
+  vertical-align: -0.1em;
+}
+
+i.codetalk__file-icon {
+  margin-right: 0.35em;
+  font-size: 0.9em;
+}
+
+.codetalk__code-inner {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0;
+
+  /* thin scrollbar */
+  scrollbar-width: thin;
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: hsl(0, 0%, 35%); border-radius: 3px; }
+}
+
+/* Inner wrapper ensures line backgrounds span the full scrollable width */
+.codetalk__code-lines {
+  display: inline-block;
+  min-width: 100%;
+  padding-bottom: 50vh;
+}
+
+/* ── Syntax highlighting (Rouge tokens — always dark) ────────────── */
+
+.codetalk__code-inner {
+  .c, .cm, .cp, .c1, .cs { color: #6c7280; font-style: italic; }
+  .err { color: #ff6b6b; background-color: transparent; }
+  .k, .kc, .kd, .kp, .kr { color: #79b8ff; font-weight: bold; }
+  .o, .ow { color: #eaeaea; font-weight: bold; }
+  .s, .sb, .sc, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss, .dl { color: #9ecbff; }
+  .na { color: #b392f0; }
+  .nb { color: #79b8ff; }
+  .nc { color: #b392f0; font-weight: bold; }
+  .no { color: #79b8ff; }
+  .nd { color: #79b8ff; font-weight: bold; }
+  .ne, .nf { color: #b392f0; font-weight: bold; }
+  .nn { color: #b392f0; }
+  .nt { color: #79b8ff; }
+  .nv, .vc, .vg, .vi { color: #79b8ff; }
+  .m, .mf, .mh, .mi, .mo, .il { color: #79b8ff; }
+  .bp { color: #999999; }
+  .w { color: #6c7280; }
+  .gi { color: #85e89d; }
+  .gd { color: #ff6b6b; }
+}
+
+/* ── Code lines ───────────────────────────────────────────────────── */
+
+.codetalk__line {
+  display: block;
+  padding: 0 1rem 0 6.5ch;
+  text-indent: -6.5ch;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #eaeaea;
+  transition: opacity 0.25s ease, background-color 0.25s ease;
+
+  &::before {
+    content: attr(data-line);
+    display: inline-block;
+    width: 4ch;
+    text-align: right;
+    margin-right: 1.5ch;
+    color: hsl(0, 0%, 42%);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &--dim {
+    opacity: 0.18;
+  }
+
+  &--active {
+    opacity: 1;
+    background-color: hsla(45, 80%, 50%, 0.12);
+    border-left: 2px solid hsla(45, 90%, 55%, 0.6);
+
+    &::before {
+      color: hsl(45, 60%, 65%);
+    }
+  }
+}
+
+/* ── Prose pane (right, reactive — shows one annotation at a time) ── */
+
+.codetalk__prose {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* ── File sections in prose (one visible at a time on desktop) ────── */
+
+.codetalk__file-section {
+  height: 100%;
+  display: none;
+}
+
+.codetalk__file-section--active {
+  display: block;
+}
+
+/* ── Codetalk footnote refs (matches sidenote-number style) ──────── */
+
+.codetalk-fnref-link {
+  color: crimson;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border-bottom: none !important;
+  position: relative;
+  top: -0.3rem;
+  padding: 0 0.1em;
+}
+
+/* ── Preamble (normal body text, above the codetalk grid) ────────── */
+
+.codetalk__preamble {
+  margin-bottom: 1em;
+}
+
+.codetalk__step {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+
+  &--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  p, ul, ol {
+    font-family: 'et-book', 'Palatino', 'Palatino Linotype', serif;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: hsl(0, 0%, 20%);
+    margin-top: 0;
+    margin-bottom: 0.8em;
+    transition: color 0.35s ease;
+  }
+
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 0.85em;
+    background: hsla(0, 0%, 0%, 0.04);
+    padding: 0.15em 0.35em;
+    border-radius: 3px;
+    transition: color 0.35s ease, background 0.35s ease;
+  }
+
+  /* Sidenotes are converted to footnotes by the plugin — hide any remnants */
+  .margin-toggle, .sidenote, .marginnote, .sidenote-number:not(.codetalk-fnref) { display: none; }
+}
+
+/* ── Mobile: interleaved code + annotation flow (JS-driven) ───────── */
+
+.codetalk--mobile {
+  display: block;
+  height: auto;
+  min-height: 0;
+  border: none;
+  border-radius: 10px;
+  background: #1f232b;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  overflow-x: hidden;
+
+  .codetalk__code-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: inherit;
+  }
+
+  .codetalk__line {
+    font-size: 0.84rem;
+    line-height: 1.65;
+  }
+
+  .codetalk__line--dim {
+    opacity: 0.35;
+  }
+
+  .codetalk__line--active {
+    opacity: 1;
+    background-color: hsla(45, 80%, 50%, 0.12);
+    border-left: 2px solid hsla(45, 90%, 55%, 0.6);
+  }
+
+  .codetalk__step--unseen {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .codetalk__step--seen {
+    opacity: 0.55;
+  }
+}
+
+.codetalk__chunk {
+  padding: 0.5rem 0;
+}
+
+/* ── Mobile file separator ────────────────────────────────────────── */
+
+.codetalk__file-separator {
+  height: 0;
+  margin-top: 1.5rem;
+  border-top: 2px solid hsl(0, 0%, 30%);
+}
+
+/* ── Mobile preamble (always visible, after file header) ──────────── */
+
+.codetalk__preamble--inline {
+  padding: 1.1rem 1.2rem 1.1rem 1.5rem;
+  background: #fffff8;
+  border-left: 3px solid hsl(210, 25%, 72%);
+  border-bottom: 1px solid hsl(0, 0%, 85%);
+
+  p, ul, ol {
+    font-family: 'et-book', 'Palatino', 'Palatino Linotype', serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: hsl(0, 0%, 35%);
+    margin-bottom: 0.6em;
+
+    &:last-child { margin-bottom: 0; }
+  }
+
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 0.85em;
+    background: hsla(0, 0%, 0%, 0.06);
+    padding: 0.15em 0.35em;
+    border-radius: 3px;
+  }
+}
+
+.codetalk__step--inline {
+  padding: 1.25rem 1.2rem 1.25rem 1.5rem;
+  background: #fffff8;
+  border-left: 3px solid hsl(38, 70%, 58%);
+  border-top: 1px solid hsl(0, 0%, 85%);
+  border-bottom: 1px solid hsl(0, 0%, 85%);
+
+  p, ul, ol {
+    font-family: 'et-book', 'Palatino', 'Palatino Linotype', serif;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: hsl(0, 0%, 20%);
+    margin-bottom: 0.6em;
+
+    &:last-child { margin-bottom: 0; }
+  }
+
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 0.85em;
+    background: hsla(0, 0%, 0%, 0.06);
+    padding: 0.15em 0.35em;
+    border-radius: 3px;
+  }
+}
+
+.codetalk__gap-ellipsis {
+  padding: 0.5rem 1rem;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.75rem;
+  color: hsl(0, 0%, 50%);
+  font-style: italic;
+  text-align: center;
+  opacity: 0.65;
+  border-top: 1px dashed hsl(0, 0%, 82%);
+  border-bottom: 1px dashed hsl(0, 0%, 82%);
+  margin: 0.25rem 0;
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  .codetalk__step {
+    p, ul, ol { color: #d0d0d0; }
+    code { background: hsla(0, 0%, 100%, 0.06); }
+    .sidenote, .marginnote { color: hsl(0, 0%, 55%); }
+  }
+
+  .codetalk::before {
+    background: rgba(0, 0, 0, 0.85);
+  }
+
+  .codetalk-fnref:after {
+    color: #00adb5;
+  }
+
+  .codetalk__file-separator {
+    border-top-color: hsl(0, 0%, 30%);
+  }
+
+  .codetalk__preamble--inline {
+    background: #282c34;
+    border-left-color: hsl(210, 20%, 45%);
+    border-bottom-color: hsl(0, 0%, 25%);
+
+    p, ul, ol { color: hsl(0, 0%, 65%); }
+    code { background: hsla(0, 0%, 100%, 0.06); }
+  }
+
+  .codetalk__step--inline {
+    background: #282c34;
+    border-left-color: hsla(38, 70%, 50%, 0.5);
+    border-top-color: hsl(0, 0%, 25%);
+    border-bottom-color: hsl(0, 0%, 25%);
+
+    p, ul, ol { color: #d0d0d0; }
+    code { background: hsla(0, 0%, 100%, 0.06); }
+  }
+
+  .codetalk__gap-ellipsis {
+    color: hsl(0, 0%, 55%);
+    border-top-color: hsl(0, 0%, 30%);
+    border-bottom-color: hsl(0, 0%, 30%);
+  }
+}
+
+/* ── Mobile: stacked code + annotation below ─────────────────────── */
+
+@media (max-width: 900px) {
+  .codetalk {
+    grid-template-columns: 1fr;
+    gap: 0;
+    height: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    overflow-x: hidden;
+  }
+
+  .codetalk__code-area {
+    height: 50vh;
+    min-height: 250px;
+  }
+
+  .codetalk__code {
+    height: 100%;
+  }
+
+  .codetalk__code-inner {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .codetalk__line {
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .codetalk__prose {
+    height: auto;
+    min-height: 3em;
+    padding: 0.75em 0;
+    overflow: visible;
+  }
+
+  .codetalk__file-section {
+    height: auto;
+  }
+
+  .codetalk__step {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+    pointer-events: none;
+
+    &--active {
+      opacity: 1;
+      max-height: 500px;
+      overflow: visible;
+      pointer-events: auto;
+      padding: 0.5em 0;
+    }
+
+    p, ul, ol {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+  }
+
+  .codetalk__file-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .codetalk__file-tab {
+    white-space: nowrap;
+    font-size: 0.7rem;
+    padding: 0.35rem 0.8rem;
+  }
+}
+
+/* ── Page-level spotlight: dim everything except the active codetalk ── */
+
+.codetalk-dimmed {
+  opacity: 0.08 !important;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+/* ── Spotlight animation ─────────────────────────────────────────── */
+
+@keyframes spotlight-on {
+  0% {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(20px);
+  }
+  60% {
+    opacity: 0.8;
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}

@@ -1,0 +1,38 @@
+# plot-config.yaml — Rendering parameters for the spaceship chart
+
+output:
+  format: png
+  dpi: 300
+  filename: spaceship-design-space.png
+
+canvas:
+  width: 14
+  height: 8
+  background: "#1a1a2e"
+
+axes:
+  x:
+    label: "Habitable Volume per Astronaut (m³)"
+    range: [0, 200]
+  y:
+    label: "Number of Astronauts"
+    range: [0, 120]
+
+regions:
+  space_stations:
+    color: "#2ecc71"
+    bounds: { x: [10, 80], y: [1, 15] }
+  spaceships:
+    color: "#3498db"
+    bounds: { x: [30, 120], y: [15, 110] }
+  superstructures:
+    color: "#9b59b6"
+    bounds: { x: [80, 200], y: [50, 120] }
+  desirable:
+    color: "#e67e22"
+    bounds: { x: [80, 110], y: [50, 110] }
+
+markers:
+  real_stations: { shape: circle, size: 8, edgecolor: white }
+  hypothetical: { shape: diamond, size: 10, edgecolor: white }
+  gravity_ring: { shape: star, size: 12, edgecolor: gold }

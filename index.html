@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapping the Spaceship Design Space — Codetalk</title>
+  <style>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'et-book', 'Palatino', 'Palatino Linotype', 'Palatino LT STD',
+               'Book Antiqua', Georgia, serif;
+  background: #fffff8;
+  color: hsl(0, 0%, 20%);
+  line-height: 1.6;
+}
+.wrapper {
+  max-width: 50%;
+  margin: 0 auto 0 12.5%;
+  padding: 3rem 0 6rem;
+  position: relative;
+}
+@media (max-width: 900px) {
+  .wrapper { max-width: 92%; margin: 0 auto; padding: 1.5rem 0 3rem; }
+}
+h1 {
+  font-weight: 400;
+  font-size: 2.25rem;
+  line-height: 1.2;
+  margin: 0 0 1.5rem;
+  color: hsl(0, 0%, 10%);
+}
+p { font-size: 1.1rem; line-height: 1.7; }
+a { color: #1e6bb8; }
+code { font-family: Consolas, Monaco, 'Andale Mono', monospace; font-size: 0.9em; }
+
+.codetalk{display:grid;grid-template-columns:55% 1fr;gap:2rem;width:140%;max-width:none;margin-right:-40%;height:70vh;min-height:0;margin-top:2em;margin-bottom:2em;position:relative;z-index:1}.codetalk::before{content:"";position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);-webkit-mask-image:linear-gradient(to right, black 0%, transparent 22%, transparent 94%, black 100%),linear-gradient(to bottom, black 0%, transparent 15%, transparent 88%, black 100%);-webkit-mask-composite:source-over;mask-image:linear-gradient(to right, black 0%, transparent 22%, transparent 94%, black 100%),linear-gradient(to bottom, black 0%, transparent 15%, transparent 88%, black 100%);mask-composite:add;opacity:var(--spotlight, 0);pointer-events:none;z-index:-1}.codetalk--spotlighting{z-index:10}.codetalk--spotlighting .codetalk__preamble p,.codetalk--spotlighting .codetalk__preamble ul,.codetalk--spotlighting .codetalk__preamble ol{color:#333}.codetalk__code-area{display:flex;flex-direction:column;height:100%;overflow:hidden;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.35),0 0 0 1px hsla(0,0%,100%,.05)}.codetalk__file-tabs{display:flex;gap:0;flex-shrink:0;border-bottom:1px solid hsl(0,0%,25%);background:#181c22;border-radius:10px 10px 0 0}.codetalk__file-tab{display:inline-flex;align-items:center;padding:.45rem 1.1rem;font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.75rem;color:hsl(0,0%,55%);background:rgba(0,0,0,0);border:none;border-bottom:2px solid rgba(0,0,0,0);cursor:pointer;transition:color .2s ease,border-color .2s ease}.codetalk__file-tab:hover{color:hsl(0,0%,75%)}.codetalk__file-tab--active{color:hsl(0,0%,85%);border-bottom-color:hsl(210,60%,55%);background:#1f232b}.codetalk__code{flex:1;min-height:0;overflow:hidden;border:none;border-radius:10px;background:#1f232b;display:flex;flex-direction:column}.codetalk__file-tabs~.codetalk__code{border-radius:0 0 10px 10px}.codetalk__code--hidden{display:none}.codetalk__code-header{display:flex;align-items:center;padding:.5rem 1rem;font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.75rem;color:hsl(0,0%,55%);border-bottom:1px solid hsl(0,0%,25%);flex-shrink:0}img.codetalk__file-icon{display:inline-block;height:1.4em;width:auto;margin-right:.35em;vertical-align:-0.1em}i.codetalk__file-icon{margin-right:.35em;font-size:.9em}.codetalk__code-inner{flex:1;overflow-y:auto;overflow-x:hidden;padding:.5rem 0;scrollbar-width:thin}.codetalk__code-inner::-webkit-scrollbar{width:6px}.codetalk__code-inner::-webkit-scrollbar-thumb{background:hsl(0,0%,35%);border-radius:3px}.codetalk__code-lines{display:inline-block;min-width:100%;padding-bottom:50vh}.codetalk__code-inner .c,.codetalk__code-inner .cm,.codetalk__code-inner .cp,.codetalk__code-inner .c1,.codetalk__code-inner .cs{color:#6c7280;font-style:italic}.codetalk__code-inner .err{color:#ff6b6b;background-color:rgba(0,0,0,0)}.codetalk__code-inner .k,.codetalk__code-inner .kc,.codetalk__code-inner .kd,.codetalk__code-inner .kp,.codetalk__code-inner .kr{color:#79b8ff;font-weight:bold}.codetalk__code-inner .o,.codetalk__code-inner .ow{color:#eaeaea;font-weight:bold}.codetalk__code-inner .s,.codetalk__code-inner .sb,.codetalk__code-inner .sc,.codetalk__code-inner .sd,.codetalk__code-inner .s2,.codetalk__code-inner .se,.codetalk__code-inner .sh,.codetalk__code-inner .si,.codetalk__code-inner .sx,.codetalk__code-inner .sr,.codetalk__code-inner .s1,.codetalk__code-inner .ss,.codetalk__code-inner .dl{color:#9ecbff}.codetalk__code-inner .na{color:#b392f0}.codetalk__code-inner .nb{color:#79b8ff}.codetalk__code-inner .nc{color:#b392f0;font-weight:bold}.codetalk__code-inner .no{color:#79b8ff}.codetalk__code-inner .nd{color:#79b8ff;font-weight:bold}.codetalk__code-inner .ne,.codetalk__code-inner .nf{color:#b392f0;font-weight:bold}.codetalk__code-inner .nn{color:#b392f0}.codetalk__code-inner .nt{color:#79b8ff}.codetalk__code-inner .nv,.codetalk__code-inner .vc,.codetalk__code-inner .vg,.codetalk__code-inner .vi{color:#79b8ff}.codetalk__code-inner .m,.codetalk__code-inner .mf,.codetalk__code-inner .mh,.codetalk__code-inner .mi,.codetalk__code-inner .mo,.codetalk__code-inner .il{color:#79b8ff}.codetalk__code-inner .bp{color:#999}.codetalk__code-inner .w{color:#6c7280}.codetalk__code-inner .gi{color:#85e89d}.codetalk__code-inner .gd{color:#ff6b6b}.codetalk__line{display:block;padding:0 1rem 0 6.5ch;text-indent:-6.5ch;white-space:pre-wrap;word-break:break-all;font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.78rem;line-height:1.55;color:#eaeaea;transition:opacity .25s ease,background-color .25s ease}.codetalk__line::before{content:attr(data-line);display:inline-block;width:4ch;text-align:right;margin-right:1.5ch;color:hsl(0,0%,42%);user-select:none;pointer-events:none}.codetalk__line--dim{opacity:.18}.codetalk__line--active{opacity:1;background-color:hsla(45,80%,50%,.12);border-left:2px solid hsla(45,90%,55%,.6)}.codetalk__line--active::before{color:hsl(45,60%,65%)}.codetalk__prose{position:relative;height:100%;overflow:hidden;padding:0}.codetalk__file-section{height:100%;display:none}.codetalk__file-section--active{display:block}.codetalk-fnref-link{color:crimson;font-size:.8rem;text-decoration:none;border-bottom:none !important;position:relative;top:-0.3rem;padding:0 .1em}.codetalk__preamble{margin-bottom:1em}.codetalk__step{position:absolute;top:0;left:0;right:0;opacity:0;transition:opacity .3s ease;pointer-events:none}.codetalk__step--active{opacity:1;pointer-events:auto}.codetalk__step p,.codetalk__step ul,.codetalk__step ol{font-family:"et-book","Palatino","Palatino Linotype",serif;font-size:1.05rem;line-height:1.7;color:#333;margin-top:0;margin-bottom:.8em;transition:color .35s ease}.codetalk__step>*:first-child{margin-top:0}.codetalk__step code{font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.85em;background:rgba(0,0,0,.04);padding:.15em .35em;border-radius:3px;transition:color .35s ease,background .35s ease}.codetalk__step .margin-toggle,.codetalk__step .sidenote,.codetalk__step .marginnote,.codetalk__step .sidenote-number:not(.codetalk-fnref){display:none}.codetalk--mobile{display:block;height:auto;min-height:0;border:none;border-radius:10px;background:#1f232b;box-shadow:0 4px 24px rgba(0,0,0,.35);overflow-x:hidden}.codetalk--mobile .codetalk__code-header{position:sticky;top:0;z-index:1;background:inherit}.codetalk--mobile .codetalk__line{font-size:.84rem;line-height:1.65}.codetalk--mobile .codetalk__line--dim{opacity:.35}.codetalk--mobile .codetalk__line--active{opacity:1;background-color:hsla(45,80%,50%,.12);border-left:2px solid hsla(45,90%,55%,.6)}.codetalk--mobile .codetalk__step--unseen{opacity:0;pointer-events:none}.codetalk--mobile .codetalk__step--seen{opacity:.55}.codetalk__chunk{padding:.5rem 0}.codetalk__file-separator{height:0;margin-top:1.5rem;border-top:2px solid hsl(0,0%,30%)}.codetalk__preamble--inline{padding:1.1rem 1.2rem 1.1rem 1.5rem;background:#fffff8;border-left:3px solid hsl(210,25%,72%);border-bottom:1px solid hsl(0,0%,85%)}.codetalk__preamble--inline p,.codetalk__preamble--inline ul,.codetalk__preamble--inline ol{font-family:"et-book","Palatino","Palatino Linotype",serif;font-size:1rem;line-height:1.7;color:hsl(0,0%,35%);margin-bottom:.6em}.codetalk__preamble--inline p:last-child,.codetalk__preamble--inline ul:last-child,.codetalk__preamble--inline ol:last-child{margin-bottom:0}.codetalk__preamble--inline code{font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.85em;background:rgba(0,0,0,.06);padding:.15em .35em;border-radius:3px}.codetalk__step--inline{padding:1.25rem 1.2rem 1.25rem 1.5rem;background:#fffff8;border-left:3px solid hsl(38,70%,58%);border-top:1px solid hsl(0,0%,85%);border-bottom:1px solid hsl(0,0%,85%)}.codetalk__step--inline p,.codetalk__step--inline ul,.codetalk__step--inline ol{font-family:"et-book","Palatino","Palatino Linotype",serif;font-size:1.05rem;line-height:1.75;color:#333;margin-bottom:.6em}.codetalk__step--inline p:last-child,.codetalk__step--inline ul:last-child,.codetalk__step--inline ol:last-child{margin-bottom:0}.codetalk__step--inline code{font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.85em;background:rgba(0,0,0,.06);padding:.15em .35em;border-radius:3px}.codetalk__gap-ellipsis{padding:.5rem 1rem;font-family:Consolas,Monaco,"Andale Mono",monospace;font-size:.75rem;color:hsl(0,0%,50%);font-style:italic;text-align:center;opacity:.65;border-top:1px dashed hsl(0,0%,82%);border-bottom:1px dashed hsl(0,0%,82%);margin:.25rem 0}[data-theme=dark] .codetalk__step p,[data-theme=dark] .codetalk__step ul,[data-theme=dark] .codetalk__step ol{color:#d0d0d0}[data-theme=dark] .codetalk__step code{background:hsla(0,0%,100%,.06)}[data-theme=dark] .codetalk__step .sidenote,[data-theme=dark] .codetalk__step .marginnote{color:hsl(0,0%,55%)}[data-theme=dark] .codetalk::before{background:rgba(0,0,0,.85)}[data-theme=dark] .codetalk-fnref:after{color:#00adb5}[data-theme=dark] .codetalk__file-separator{border-top-color:hsl(0,0%,30%)}[data-theme=dark] .codetalk__preamble--inline{background:#282c34;border-left-color:hsl(210,20%,45%);border-bottom-color:hsl(0,0%,25%)}[data-theme=dark] .codetalk__preamble--inline p,[data-theme=dark] .codetalk__preamble--inline ul,[data-theme=dark] .codetalk__preamble--inline ol{color:hsl(0,0%,65%)}[data-theme=dark] .codetalk__preamble--inline code{background:hsla(0,0%,100%,.06)}[data-theme=dark] .codetalk__step--inline{background:#282c34;border-left-color:hsla(38,70%,50%,.5);border-top-color:hsl(0,0%,25%);border-bottom-color:hsl(0,0%,25%)}[data-theme=dark] .codetalk__step--inline p,[data-theme=dark] .codetalk__step--inline ul,[data-theme=dark] .codetalk__step--inline ol{color:#d0d0d0}[data-theme=dark] .codetalk__step--inline code{background:hsla(0,0%,100%,.06)}[data-theme=dark] .codetalk__gap-ellipsis{color:hsl(0,0%,55%);border-top-color:hsl(0,0%,30%);border-bottom-color:hsl(0,0%,30%)}@media(max-width: 900px){.codetalk{grid-template-columns:1fr;gap:0;height:auto;min-height:0;width:100%;max-width:100%;margin-left:0;margin-right:0;overflow-x:hidden}.codetalk__code-area{height:50vh;min-height:250px}.codetalk__code{height:100%}.codetalk__code-inner{overflow-x:auto;-webkit-overflow-scrolling:touch}.codetalk__line{font-size:.72rem;line-height:1.5}.codetalk__prose{height:auto;min-height:3em;padding:.75em 0;overflow:visible}.codetalk__file-section{height:auto}.codetalk__step{position:relative;top:auto;left:auto;right:auto;opacity:0;max-height:0;overflow:hidden;padding:0;transition:opacity .3s ease,max-height .3s ease;pointer-events:none}.codetalk__step--active{opacity:1;max-height:500px;overflow:visible;pointer-events:auto;padding:.5em 0}.codetalk__step p,.codetalk__step ul,.codetalk__step ol{font-size:.95rem;line-height:1.6}.codetalk__file-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}.codetalk__file-tab{white-space:nowrap;font-size:.7rem;padding:.35rem .8rem}}.codetalk-dimmed{opacity:.08 !important;transition:opacity .4s ease;pointer-events:none}@keyframes spotlight-on{0%{opacity:0;transform:scale(1.08);filter:blur(20px)}60%{opacity:.8;filter:blur(4px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+  </style>
+</head>
+<body>
+  <main class="wrapper">
+    <h1>Mapping the Spaceship Design Space</h1>
+    <div class="codetalk__preamble">
+<p>This script builds a scatter plot mapping the design space for crewed spacecraft and
+space stations. Starting from real historical data — Salyut, Skylab, Mir, the ISS —
+it adds hypothetical designs and carves the resulting landscape into regions, making
+a visual case for what an ideal long-duration spacecraft might look like.</p>
+</div>
+
+<div class="codetalk__preamble">
+<p>The Python script reads its rendering parameters from this YAML companion file.
+Separating configuration from code lets you tweak the chart’s appearance — colours,
+axis ranges, marker styles — without touching the plotting logic itself.</p>
+</div>
+
+<div class="codetalk">
+  <div class="codetalk__code-area">
+    <div class="codetalk__file-tabs">
+<button class="codetalk__file-tab codetalk__file-tab--active" data-file="spaceship-region.py"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" class="codetalk__file-icon" alt=""> spaceship-region.py</button>
+<button class="codetalk__file-tab" data-file="plot-config.yaml"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/yaml/yaml-original.svg" class="codetalk__file-icon" alt=""> plot-config.yaml</button>
+</div>
+<div class="codetalk__code" data-file="spaceship-region.py">
+<div class="codetalk__code-inner"><div class="codetalk__code-lines">
+<div class="codetalk__line" data-line="1"><span class="kn">import</span> <span class="n">plotly.graph_objects</span> <span class="k">as</span> <span class="n">go</span></div>
+<div class="codetalk__line" data-line="2"><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span></div>
+<div class="codetalk__line" data-line="3"><span class="kn">import</span> <span class="n">math</span></div>
+<div class="codetalk__line" data-line="4">&nbsp;</div>
+<div class="codetalk__line" data-line="5"><span class="c1"># Shared space station data</span></div>
+<div class="codetalk__line" data-line="6"><span class="c1"></span><span class="n">SPACE_STATIONS</span> <span class="o">=</span> <span class="p">[</span></div>
+<div class="codetalk__line" data-line="7">    <span class="c1"># Real historical stations</span></div>
+<div class="codetalk__line" data-line="8"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Salyut-1</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">214</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="9">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">MORL</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">254.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">254.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="10">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">LORL</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">1905.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">1905.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">1905.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="11">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Haven-1</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="12">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Haven-2</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1160</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1160</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="13">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Skylab</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">499</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">351.6</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">270</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="14">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Tiangong</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">726.6</span> <span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">340</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">121</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="15">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">ISS</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1200</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1005</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">388</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="16">    <span class="c1"># Starship (SpaceX)</span></div>
+<div class="codetalk__line" data-line="17"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Starship-100</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="18">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Starship-10</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="19">    <span class="c1"># {'name': 'Starship-50/50', 'total_volume': 1000, 'pressurised_volume': 1000, 'habitable_volume': 1000, 'crew': 30, 'is_real': False, 'has_gravity': False},</span></div>
+<div class="codetalk__line" data-line="20"><span class="c1"></span>    <span class="c1"># Planned station</span></div>
+<div class="codetalk__line" data-line="21"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Gateway</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">183</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">183</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">125</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="22">&nbsp;</div>
+<div class="codetalk__line" data-line="23">    <span class="c1"># Conceptual designs</span></div>
+<div class="codetalk__line" data-line="24"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">von Braun wheel</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">6217.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">6217.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">0.8</span><span class="o">*</span><span class="mf">6217.85</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="25">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Space Base</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">5921</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="26">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Hexagonal Station</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mf">1274.3</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">980</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">980</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="27">    <span class="p">{</span></div>
+<div class="codetalk__line" data-line="28">        <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">2035 Vast Station</span><span class="sh">'</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="29">        <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">2160</span><span class="p">,</span>  <span class="c1"># Using pressurized volume as total volume</span></div>
+<div class="codetalk__line" data-line="30"><span class="c1"></span>        <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">2160</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="31">        <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">950</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="32">        <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="33">        <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="34">        <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span></div>
+<div class="codetalk__line" data-line="35">    <span class="p">},</span></div>
+<div class="codetalk__line" data-line="36">    <span class="p">{</span></div>
+<div class="codetalk__line" data-line="37">        <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Gateway</span><span class="se">\'</span><span class="s">s von Braun</span><span class="sh">'</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="38">        <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">11906250</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="39">        <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">11906250</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="40">        <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">8000000</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="41">        <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1400</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="42">        <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="43">        <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span></div>
+<div class="codetalk__line" data-line="44">    <span class="p">},</span></div>
+<div class="codetalk__line" data-line="45">    <span class="p">{</span></div>
+<div class="codetalk__line" data-line="46">    <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Stanford Torus</span><span class="sh">'</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="47">    <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">69220470</span><span class="p">,</span>  <span class="c1"># Correct volume in cubic meters</span></div>
+<div class="codetalk__line" data-line="48"><span class="c1"></span>    <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">69220470</span><span class="p">,</span>  <span class="c1"># Assuming entire torus is pressurized</span></div>
+<div class="codetalk__line" data-line="49"><span class="c1"></span>    <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">34610235</span><span class="p">,</span>  <span class="c1"># Estimated 50% of total volume as habitable</span></div>
+<div class="codetalk__line" data-line="50"><span class="c1"></span>    <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>  <span class="c1"># Original NASA design specification</span></div>
+<div class="codetalk__line" data-line="51"><span class="c1"></span>    <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="52">    <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span>  <span class="c1"># Via rotation</span></div>
+<div class="codetalk__line" data-line="53"><span class="c1"></span>    <span class="p">},</span></div>
+<div class="codetalk__line" data-line="54">    <span class="p">{</span></div>
+<div class="codetalk__line" data-line="55">    <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">"</span><span class="s">O</span><span class="sh">'</span><span class="s">Neill Cylinder</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="56">    <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1636828970203</span><span class="p">,</span>  <span class="c1"># Volume in cubic meters</span></div>
+<div class="codetalk__line" data-line="57"><span class="c1"></span>    <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1604092390799</span><span class="p">,</span>  <span class="c1"># 98% of total volume</span></div>
+<div class="codetalk__line" data-line="58"><span class="c1"></span>    <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1227621727652</span><span class="p">,</span>  <span class="c1"># 75% of total volume as habitable</span></div>
+<div class="codetalk__line" data-line="59"><span class="c1"></span>    <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1000000</span><span class="p">,</span>  <span class="c1"># Keeping original crew estimate</span></div>
+<div class="codetalk__line" data-line="60"><span class="c1"></span>    <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="61">    <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span>  <span class="c1"># Via rotation</span></div>
+<div class="codetalk__line" data-line="62"><span class="c1"></span>    <span class="p">},</span></div>
+<div class="codetalk__line" data-line="63">    <span class="p">{</span></div>
+<div class="codetalk__line" data-line="64">    <span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">"</span><span class="s">O</span><span class="sh">'</span><span class="s">Neill Cylinder (pair)</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="65">    <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3273657940405</span><span class="p">,</span>  <span class="c1"># Volume in cubic meters</span></div>
+<div class="codetalk__line" data-line="66"><span class="c1"></span>    <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3208184781597</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="67">    <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">2455243455304</span><span class="p">,</span>  <span class="c1"># 75% of total volume as habitable</span></div>
+<div class="codetalk__line" data-line="68"><span class="c1"></span>    <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">2000000</span><span class="p">,</span>  <span class="c1"># Doubled crew estimate</span></div>
+<div class="codetalk__line" data-line="69"><span class="c1"></span>    <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="70">    <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span>  <span class="c1"># Via rotation</span></div>
+<div class="codetalk__line" data-line="71"><span class="c1"></span>    <span class="p">},</span></div>
+<div class="codetalk__line" data-line="72">    <span class="c1"># Sierra Nevada LIFE modules</span></div>
+<div class="codetalk__line" data-line="73"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">LIFE-285</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">285</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">285</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">160</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="74">    <span class="c1"># {'name': 'LIFE-5000', 'total_volume': 5000, 'pressurised_volume': 5000, 'habitable_volume': 2800, 'crew': 32, 'is_real': False, 'has_gravity': False},</span></div>
+<div class="codetalk__line" data-line="75"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Kalpana-1</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">167000</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">167000</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">85000</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3000</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="76">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Bernal Sphere</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">500000</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">500000</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">250000</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="77">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">Ideal Spaceship</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">8000</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">8000</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">6300</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">70</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="78">    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">10 Ideal Spaceships</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10</span><span class="o">*</span><span class="mi">8000</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10</span><span class="o">*</span><span class="mi">8000</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10</span><span class="o">*</span><span class="mi">6300</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">10</span><span class="o">*</span><span class="mi">70</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="79">    <span class="c1"># BA 2100 (Bigelow Olympus) - conceptual 0g station</span></div>
+<div class="codetalk__line" data-line="80"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">BA 2100</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">2250</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">2250</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1800</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="81">    <span class="c1"># TransHab (NASA inflatable module concept)</span></div>
+<div class="codetalk__line" data-line="82"><span class="c1"></span>    <span class="p">{</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">TransHab</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">340</span><span class="p">,</span> <span class="sh">'</span><span class="s">pressurised_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">340</span><span class="p">,</span> <span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">:</span> <span class="mi">340</span><span class="p">,</span> <span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span></div>
+<div class="codetalk__line" data-line="83"><span class="p">]</span></div>
+<div class="codetalk__line" data-line="84">&nbsp;</div>
+<div class="codetalk__line" data-line="85"><span class="k">def</span> <span class="nf">get_station_colors</span><span class="p">(</span><span class="n">data</span><span class="p">):</span></div>
+<div class="codetalk__line" data-line="86">    <span class="sh">"""</span><span class="s">Helper function to get colors based on station type</span><span class="sh">"""</span></div>
+<div class="codetalk__line" data-line="87">    <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span></div>
+<div class="codetalk__line" data-line="88">    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span></div>
+<div class="codetalk__line" data-line="89">        <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="sh">'</span><span class="s">is_real</span><span class="sh">'</span><span class="p">]:</span></div>
+<div class="codetalk__line" data-line="90">            <span class="n">colors</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sh">'</span><span class="s">#4CAF50</span><span class="sh">'</span><span class="p">)</span>  <span class="c1"># Green for real stations (works in both light/dark modes)</span></div>
+<div class="codetalk__line" data-line="91"><span class="c1"></span>        <span class="k">elif</span> <span class="n">station</span><span class="p">[</span><span class="sh">'</span><span class="s">has_gravity</span><span class="sh">'</span><span class="p">]:</span></div>
+<div class="codetalk__line" data-line="92">            <span class="n">colors</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sh">'</span><span class="s">#2979FF</span><span class="sh">'</span><span class="p">)</span>  <span class="c1"># Blue for artificial gravity stations</span></div>
+<div class="codetalk__line" data-line="93"><span class="c1"></span>        <span class="k">else</span><span class="p">:</span></div>
+<div class="codetalk__line" data-line="94">            <span class="n">colors</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sh">'</span><span class="s">#F44336</span><span class="sh">'</span><span class="p">)</span>  <span class="c1"># Red for planned 0-g stations</span></div>
+<div class="codetalk__line" data-line="95"><span class="c1"></span>    <span class="k">return</span> <span class="n">colors</span></div>
+<div class="codetalk__line" data-line="96">&nbsp;</div>
+<div class="codetalk__line" data-line="97"><span class="k">def</span> <span class="nf">create_multidimensional_bubble_chart</span><span class="p">():</span></div>
+<div class="codetalk__line" data-line="98">    <span class="c1"># Filter out the superstructures and Salyut-1 for plotting</span></div>
+<div class="codetalk__line" data-line="99"><span class="c1"></span>    <span class="n">excluded_stations</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">BA 2100</span><span class="sh">'</span><span class="p">]</span>  <span class="c1"># Now excluding BA 2100 as well</span></div>
+<div class="codetalk__line" data-line="100"><span class="c1"></span>    <span class="n">plot_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">station</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">SPACE_STATIONS</span><span class="p">)</span> <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_stations</span><span class="p">]</span></div>
+<div class="codetalk__line" data-line="101">&nbsp;</div>
+<div class="codetalk__line" data-line="102">    <span class="c1"># Extract data for plotting (only for included stations)</span></div>
+<div class="codetalk__line" data-line="103"><span class="c1"></span>    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">SPACE_STATIONS</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="sh">'</span><span class="s">name</span><span class="sh">'</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">plot_indices</span><span class="p">]</span></div>
+<div class="codetalk__line" data-line="104">    <span class="n">total_volumes</span> <span class="o">=</span> <span class="p">[</span><span class="n">SPACE_STATIONS</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="sh">'</span><span class="s">total_volume</span><span class="sh">'</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">plot_indices</span><span class="p">]</span></div>
+<div class="codetalk__line" data-line="105">    <span class="n">habitable_volumes</span> <span class="o">=</span> <span class="p">[</span><span class="n">SPACE_STATIONS</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="sh">'</span><span class="s">habitable_volume</span><span class="sh">'</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">plot_indices</span><span class="p">]</span></div>
+<div class="codetalk__line" data-line="106">    <span class="n">crews</span> <span class="o">=</span> <span class="p">[</span><span class="n">SPACE_STATIONS</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="sh">'</span><span class="s">crew</span><span class="sh">'</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">plot_indices</span><span class="p">]</span></div>
+<div class="codetalk__line" data-line="107">    <span class="n">habitable_volume_per_astronaut</span> <span class="o">=</span> <span class="p">[</span><span class="n">vol</span><span class="o">/</span><span class="n">crew</span> <span class="k">for</span> <span class="n">vol</span><span class="p">,</span> <span class="n">crew</span> <span class="ow">in</span> <span class="nf">zip</span><span class="p">(</span><span class="n">habitable_volumes</span><span class="p">,</span> <span class="n">crews</span><span class="p">)]</span></div>
+<div class="codetalk__line" data-line="108">&nbsp;</div>
+<div class="codetalk__line" data-line="109">    <span class="c1"># Calculate marker sizes (reduced size for better fit)</span></div>
+<div class="codetalk__line" data-line="110"><span class="c1"></span>    <span class="n">marker_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="nf">log10</span><span class="p">(</span><span class="n">vol</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span> <span class="k">for</span> <span class="n">vol</span> <span class="ow">in</span> <span class="n">total_volumes</span><span class="p">]</span></div>
+<div class="codetalk__line" data-line="111">&nbsp;</div>
+<div class="codetalk__line" data-line="112">    <span class="c1"># Adjust size for Hexagonal Station specifically</span></div>
+<div class="codetalk__line" data-line="113"><span class="c1"></span>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span></div>
+<div class="codetalk__line" data-line="114">        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="sh">'</span><span class="s">Hexagonal Station</span><span class="sh">'</span><span class="p">:</span></div>
+<div class="codetalk__line" data-line="115">            <span class="n">marker_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.8</span>  <span class="c1"># Make Hexagonal Station marker 20% smaller</span></div>
+<div class="codetalk__line" data-line="116"><span class="c1"></span>    </div>
+<div class="codetalk__line" data-line="117">    <span class="c1"># Create figure</span></div>
+<div class="codetalk__line" data-line="118"><span class="c1"></span>    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="p">.</span><span class="nc">Figure</span><span class="p">()</span></div>
+<div class="codetalk__line" data-line="119">&nbsp;</div>
+<div class="codetalk__line" data-line="120">    <span class="c1"># Add rectangular regions for different space structure categories</span></div>
+<div class="codetalk__line" data-line="121"><span class="c1"></span>    <span class="c1"># Superstructures region (130+ m³/person, 140+ crew)</span></div>
+<div class="codetalk__line" data-line="122"><span class="c1"></span>    <span class="n">fig</span><span class="p">.</span><span class="nf">add_shape</span><span class="p">(</span></div>
+<div class="codetalk__line" data-line="123">        <span class="nb">type</span><span class="o">=</span><span class="sh">"</span><span class="s">rect</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="124">        <span class="n">x0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="125">        <span class="n">x1</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">140</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="126">        <span class="n">fillcolor</span><span class="o">=</span><span class="sh">"</span><span class="s">rgba(128, 0, 128, 0.08)</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="127">        <span class="n">line</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="sh">"</span><span class="s">purple</span><span class="sh">"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span></div>
+<div class="codetalk__line" data-line="128">        <span class="n">layer</span><span class="o">=</span><span class="sh">"</span><span class="s">below</span><span class="sh">"</span></div>
+<div class="codetalk__line" data-line="129">    <span class="p">)</span></div>
+<div class="codetalk__line" data-line="130">    <span class="c1"># Spaceships region (100-130 m³/person, 50-140 crew)</span></div>
+<div class="codetalk__line" data-line="131"><span class="c1"></span>    <span class="n">fig</span><span class="p">.</span><span class="nf">add_shape</span><span class="p">(</span></div>
+<div class="codetalk__line" data-line="132">        <span class="nb">type</span><span class="o">=</span><span class="sh">"</span><span class="s">rect</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="133">        <span class="n">x0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="134">        <span class="n">x1</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="135">        <span class="n">fillcolor</span><span class="o">=</span><span class="sh">"</span><span class="s">rgba(0, 0, 255, 0.08)</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="136">        <span class="n">line</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="sh">"</span><span class="s">blue</span><span class="sh">"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span></div>
+<div class="codetalk__line" data-line="137">        <span class="n">layer</span><span class="o">=</span><span class="sh">"</span><span class="s">below</span><span class="sh">"</span></div>
+<div class="codetalk__line" data-line="138">    <span class="p">)</span></div>
+<div class="codetalk__line" data-line="139">    <span class="c1"># Space Stations region (0-100 m³/person, 0-50 crew)</span></div>
+<div class="codetalk__line" data-line="140"><span class="c1"></span>    <span class="n">fig</span><span class="p">.</span><span class="nf">add_shape</span><span class="p">(</span></div>
+<div class="codetalk__line" data-line="141">        <span class="nb">type</span><span class="o">=</span><span class="sh">"</span><span class="s">rect</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="142">        <span class="n">x0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="143">        <span class="n">x1</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="144">        <span class="n">fillcolor</span><span class="o">=</span><span class="sh">"</span><span class="s">rgba(0, 255, 0, 0.1)</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="145">        <span class="n">line</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="sh">"</span><span class="s">green</span><span class="sh">"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span></div>
+<div class="codetalk__line" data-line="146">        <span class="n">layer</span><span class="o">=</span><span class="sh">"</span><span class="s">below</span><span class="sh">"</span></div>
+<div class="codetalk__line" data-line="147">    <span class="p">)</span></div>
+<div class="codetalk__line" data-line="148">&nbsp;</div>
+<div class="codetalk__line" data-line="149">    <span class="c1"># Desirable region (80-110 m³/person, 50-110 crew)</span></div>
+<div class="codetalk__line" data-line="150"><span class="c1"></span>    <span class="n">fig</span><span class="p">.</span><span class="nf">add_shape</span><span class="p">(</span></div>
+<div class="codetalk__line" data-line="151">        <span class="nb">type</span><span class="o">=</span><span class="sh">"</span><span class="s">rect</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="152">        <span class="n">x0</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="153">        <span class="n">x1</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="154">        <span class="n">fillcolor</span><span class="o">=</span><span class="sh">"</span><span class="s">rgba(255, 165, 0, 0.15)</span><span class="sh">"</span><span class="p">,</span></div>
+<div class="codetalk__line" data-line="155">        <span class="n">line</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="sh">"</span><span class="s">orange</span><span class="sh">"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span></div>
+<div class="codetalk__line" data-line="156">        <span class="n">layer</span><span class="o">=</span><span class="sh">"</span><span class="s">below</span><span class="sh">"</span></div>
+<div class="codetalk__line" data-line="157">    <span class="p">)</span></div>
+</div></div>
+</div>
+<div class="codetalk__code codetalk__code--hidden" data-file="plot-config.yaml">
+<div class="codetalk__code-inner"><div class="codetalk__code-lines">
+<div class="codetalk__line" data-line="1"><span class="c1"># plot-config.yaml — Rendering parameters for the spaceship chart</span></div>
+<div class="codetalk__line" data-line="2">&nbsp;</div>
+<div class="codetalk__line" data-line="3"><span class="na">output</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="4">  <span class="na">format</span><span class="pi">:</span> <span class="s">png</span></div>
+<div class="codetalk__line" data-line="5">  <span class="na">dpi</span><span class="pi">:</span> <span class="m">300</span></div>
+<div class="codetalk__line" data-line="6">  <span class="na">filename</span><span class="pi">:</span> <span class="s">spaceship-design-space.png</span></div>
+<div class="codetalk__line" data-line="7">&nbsp;</div>
+<div class="codetalk__line" data-line="8"><span class="na">canvas</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="9">  <span class="na">width</span><span class="pi">:</span> <span class="m">14</span></div>
+<div class="codetalk__line" data-line="10">  <span class="na">height</span><span class="pi">:</span> <span class="m">8</span></div>
+<div class="codetalk__line" data-line="11">  <span class="na">background</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#1a1a2e"</span></div>
+<div class="codetalk__line" data-line="12">&nbsp;</div>
+<div class="codetalk__line" data-line="13"><span class="na">axes</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="14">  <span class="na">x</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="15">    <span class="na">label</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Habitable</span><span class="nv"> </span><span class="s">Volume</span><span class="nv"> </span><span class="s">per</span><span class="nv"> </span><span class="s">Astronaut</span><span class="nv"> </span><span class="s">(m³)"</span></div>
+<div class="codetalk__line" data-line="16">    <span class="na">range</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">0</span><span class="pi">,</span> <span class="nv">200</span><span class="pi">]</span></div>
+<div class="codetalk__line" data-line="17">  <span class="na">y</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="18">    <span class="na">label</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Number</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">Astronauts"</span></div>
+<div class="codetalk__line" data-line="19">    <span class="na">range</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">0</span><span class="pi">,</span> <span class="nv">120</span><span class="pi">]</span></div>
+<div class="codetalk__line" data-line="20">&nbsp;</div>
+<div class="codetalk__line" data-line="21"><span class="na">regions</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="22">  <span class="na">space_stations</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="23">    <span class="na">color</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#2ecc71"</span></div>
+<div class="codetalk__line" data-line="24">    <span class="na">bounds</span><span class="pi">:</span> <span class="pi">{</span> <span class="nv">x</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">10</span><span class="pi">,</span> <span class="nv">80</span><span class="pi">],</span> <span class="nv">y</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">1</span><span class="pi">,</span> <span class="nv">15</span><span class="pi">]</span> <span class="pi">}</span></div>
+<div class="codetalk__line" data-line="25">  <span class="na">spaceships</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="26">    <span class="na">color</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#3498db"</span></div>
+<div class="codetalk__line" data-line="27">    <span class="na">bounds</span><span class="pi">:</span> <span class="pi">{</span> <span class="nv">x</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">30</span><span class="pi">,</span> <span class="nv">120</span><span class="pi">],</span> <span class="nv">y</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">15</span><span class="pi">,</span> <span class="nv">110</span><span class="pi">]</span> <span class="pi">}</span></div>
+<div class="codetalk__line" data-line="28">  <span class="na">superstructures</span><span class="pi">:</span></div>
+<div class="codetalk__line" data-line="29">    <span class="na">color</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#9b59b6"</span></div>
+<div class="codetalk__line" data-line="30">    <span class="na">bounds</span><span class="pi">:</span> <span class="pi">{</span> <span class="nv">x</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">80</span><span class="pi">,</span> <span class="nv">200</span><span class="pi">],</span> <span class="nv">y</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">50</span><span class="pi">,</span> <span class="nv">120</span><span class="pi">]</span> <span class="pi">}</span></div>
+<div class="codetalk__line" data-line="31">  <span class="na">desirable</span><span class="pi">:</span></div>
+</div></div>
+</div>
+  </div>
+  <div class="codetalk__prose">
+    <div class="codetalk__file-section codetalk__file-section--active" data-file="spaceship-region.py">
+<div class="codetalk__step" data-start="7" data-end="15">
+<p>Every entry in <code>SPACE_STATIONS</code> carries the same shape: total volume, pressurised
+volume, habitable volume, crew size, and two boolean flags — <code>is_real</code> and
+<code>has_gravity</code>. The real historical stations anchor the chart. Salyut-1 gave three
+cosmonauts just 30 m³ each; the ISS, humanity’s largest off-world structure, still
+only offers about 55 m³ per person. These numbers set the baseline for everything
+that follows.</p>
+</div>
+<div class="codetalk__step" data-start="77" data-end="78">
+<p>Buried near the end of the data list is the punchline: the “Ideal Spaceship.” At
+8,000 m³ total volume for a crew of 70, it offers 90 m³ of habitable space per
+person — roughly the floor area of a comfortable studio apartment, replicated in
+three dimensions. The <code>10 Ideal Spaceships</code> entry right below it tests whether the
+concept scales to a fleet.</p>
+</div>
+<div class="codetalk__step" data-start="102" data-end="107">
+<p>The x-axis of the entire chart is born on line 107: habitable volume per astronaut.
+Not total volume, not pressurised volume — <em>habitable</em> volume, the space a crew
+member can actually use. This single derived metric is what separates cramped
+capsules from genuine long-duration habitats.</p>
+</div>
+<div class="codetalk__step" data-start="120" data-end="157">
+<p>Four overlapping rectangles carve the plot into design regions. The green “Space
+Stations” box covers small crews and modest per-person volumes — everything humanity
+has built so far. The blue “Spaceships” region pushes crew capacity up toward 110.
+The purple “Superstructures” envelope covers the mega-habitats. And the orange
+“Desirable Spaceship Design Space” box marks the sweet spot: 80–110 m³ per person,
+50–110 crew. The Ideal Spaceship lands squarely inside it.</p>
+</div>
+
+</div>
+<div class="codetalk__file-section" data-file="plot-config.yaml">
+<div class="codetalk__step" data-start="7" data-end="12">
+<p>The <code>canvas</code> block sets the physical chart to 14 by 8 inches at 300 DPI on a dark
+navy background (<code>#1a1a2e</code>). At these dimensions the output image is large enough
+for print but still renders quickly during iterative tweaking.</p>
+</div>
+<div class="codetalk__step" data-start="22" data-end="31">
+<p>Four entries under <code>regions</code> define the coloured rectangles that partition the design
+space. Each maps a name to a fill colour and x/y bounds, matching the rectangles
+drawn by <code>add_region_rect()</code> in the Python script. The <code>desirable</code> region — orange,
+80–110 m³ per person, 50–110 crew — is the tightest box: the sweet spot the Ideal
+Spaceship was designed to hit.</p>
+
+  </main>
+  <!-- codetalk.js inlined below -->
+  <script>
+(function () {
+  'use strict';
+
+  // Initialize each .codetalk block independently
+  var codetalks = document.querySelectorAll('.codetalk');
+  for (var cw = 0; cw < codetalks.length; cw++) {
+    initCodetalk(codetalks[cw]);
+  }
+
+  function initCodetalk(container) {
+    var prosePane = container.querySelector('.codetalk__prose');
+    if (!prosePane) return;
+
+    var allCodePanes = Array.prototype.slice.call(
+      container.querySelectorAll('.codetalk__code')
+    );
+    if (!allCodePanes.length) return;
+
+    var fileSections = Array.prototype.slice.call(
+      prosePane.querySelectorAll('.codetalk__file-section')
+    );
+    var fileTabs = Array.prototype.slice.call(
+      container.querySelectorAll('.codetalk__file-tab')
+    );
+    var activeFileIdx = -1;
+    var fullyInView = false;
+
+    // ── Build per-file data ──────────────────────────────────────
+
+    function parseAnnotation(step) {
+      return {
+        start: parseInt(step.getAttribute('data-start'), 10),
+        end:   parseInt(step.getAttribute('data-end'),   10),
+        element: step
+      };
+    }
+
+    var files = [];
+
+    if (fileSections.length > 0) {
+      for (var f = 0; f < fileSections.length; f++) {
+        var sec = fileSections[f];
+        var label = sec.getAttribute('data-file');
+        var cp = null;
+        for (var c = 0; c < allCodePanes.length; c++) {
+          if (allCodePanes[c].getAttribute('data-file') === label) {
+            cp = allCodePanes[c]; break;
+          }
+        }
+        if (!cp) continue;
+
+        var stepsInSec = Array.prototype.slice.call(
+          sec.querySelectorAll('.codetalk__step')
+        );
+        files.push({
+          label: label,
+          codePane: cp,
+          codeInner: cp.querySelector('.codetalk__code-inner'),
+          section: sec,
+          steps: stepsInSec,
+          annotations: stepsInSec.map(parseAnnotation),
+          lines: [],
+          preambleBottom: 0,
+          activeStepIndices: []
+        });
+      }
+    } else {
+      // Fallback: no file-section wrappers (single-file)
+      var cp0 = allCodePanes[0];
+      var stepsAll = Array.prototype.slice.call(
+        prosePane.querySelectorAll('.codetalk__step')
+      );
+      files.push({
+        label: cp0.getAttribute('data-file') || '',
+        codePane: cp0,
+        codeInner: cp0.querySelector('.codetalk__code-inner'),
+        section: prosePane,
+        steps: stepsAll,
+        annotations: stepsAll.map(parseAnnotation),
+        lines: [],
+        preambleBottom: 0,
+        activeStepIndices: []
+      });
+    }
+
+    if (!files.length) return;
+
+    function cur() { return files[activeFileIdx]; }
+
+    // ── File switching ───────────────────────────────────────────
+
+    function switchFile(idx) {
+      if (idx === activeFileIdx) return;
+
+      if (activeFileIdx >= 0) {
+        var prev = files[activeFileIdx];
+        prev.codePane.classList.add('codetalk__code--hidden');
+        prev.section.classList.remove('codetalk__file-section--active');
+        for (var i = 0; i < prev.steps.length; i++) {
+          prev.steps[i].classList.remove('codetalk__step--active');
+        }
+        for (var i = 0; i < prev.lines.length; i++) {
+          prev.lines[i].classList.remove('codetalk__line--active', 'codetalk__line--dim');
+        }
+        prev.activeStepIndices = [];
+        if (fileTabs[activeFileIdx]) {
+          fileTabs[activeFileIdx].classList.remove('codetalk__file-tab--active');
+        }
+      }
+
+      activeFileIdx = idx;
+      var next = files[idx];
+      next.codePane.classList.remove('codetalk__code--hidden');
+      next.section.classList.add('codetalk__file-section--active');
+      if (fileTabs[idx]) {
+        fileTabs[idx].classList.add('codetalk__file-tab--active');
+      }
+
+      measurePreamble();
+      checkActiveAnnotation();
+    }
+
+    // ── Tab click handlers ───────────────────────────────────────
+
+    for (var t = 0; t < fileTabs.length; t++) {
+      (function (idx) {
+        fileTabs[idx].addEventListener('click', function () {
+          switchFile(idx);
+        });
+      })(t);
+    }
+
+    // ── Annotation trigger detection ─────────────────────────────
+    // Sticky behavior: the active annotation stays active as long as ANY
+    // part of its line range is in view. When its last line scrolls out
+    // (or its first line scrolls below the pane), pick whichever other
+    // annotation has the largest visible range.
+
+    function checkActiveAnnotation() {
+      var file = cur();
+      if (!file || !file.codeInner) return;
+
+      var paneRect = file.codeInner.getBoundingClientRect();
+      var paneTop = paneRect.top;
+      var paneBottom = paneRect.bottom;
+
+      function rectsFor(ann) {
+        var firstLine = file.codeInner.querySelector('[data-line="' + ann.start + '"]');
+        var lastLine  = file.codeInner.querySelector('[data-line="' + ann.end   + '"]');
+        if (!firstLine || !lastLine) return null;
+        return {
+          first: firstLine.getBoundingClientRect(),
+          last: lastLine.getBoundingClientRect()
+        };
+      }
+
+      var prev = file.activeStepIndices || [];
+      var currentIdx = prev.length ? prev[0] : -1;
+
+      if (currentIdx >= 0) {
+        var rects = rectsFor(file.annotations[currentIdx]);
+        if (rects && rects.last.bottom >= paneTop && rects.first.top <= paneBottom) {
+          positionActiveSteps();
+          return;
+        }
+      }
+
+      var bestIdx = -1;
+      for (var i = 0; i < file.annotations.length; i++) {
+        var r = rectsFor(file.annotations[i]);
+        if (!r) continue;
+        if (r.last.bottom >= paneTop && r.first.top <= paneBottom) {
+          bestIdx = i;
+          break;
+        }
+      }
+
+      var newActive = bestIdx >= 0 ? [bestIdx] : [];
+      if (newActive.length === prev.length && newActive.every(function (v, j) { return v === prev[j]; })) {
+        positionActiveSteps();
+        return;
+      }
+      file.activeStepIndices = newActive;
+      updateDisplay();
+    }
+
+    // ── Position active steps near their annotated lines ─────────
+
+    function positionActiveSteps() {
+      var file = cur();
+      if (!file) return;
+      var indices = file.activeStepIndices || [];
+      if (!indices.length) return;
+
+      var proseRect = prosePane.getBoundingClientRect();
+      var lastBottom = file.preambleBottom;
+
+      for (var j = 0; j < indices.length; j++) {
+        var ann = file.annotations[indices[j]];
+        var step = ann.element;
+        var firstLine = file.codeInner.querySelector('[data-line="' + ann.start + '"]');
+        if (!firstLine) continue;
+
+        var lineRect = firstLine.getBoundingClientRect();
+        var idealTop = lineRect.top - proseRect.top;
+        var stepHeight = step.offsetHeight;
+        var maxTop = proseRect.height - stepHeight;
+
+        var top = Math.max(lastBottom, Math.min(idealTop, maxTop));
+        step.style.top = top + 'px';
+        lastBottom = top + stepHeight + 8;
+      }
+    }
+
+    // ── Update highlighting and prose ────────────────────────────
+
+    function updateDisplay() {
+      var file = cur();
+      if (!file) return;
+
+      var lines = file.lines;
+      var steps = file.steps;
+      var activeSet = file.activeStepIndices || [];
+      var anns = file.annotations;
+
+      if (!activeSet.length) {
+        for (var i = 0; i < lines.length; i++) {
+          lines[i].classList.remove('codetalk__line--active', 'codetalk__line--dim');
+        }
+      } else {
+        var activeLines = {};
+        for (var a = 0; a < activeSet.length; a++) {
+          var ann = anns[activeSet[a]];
+          for (var ln = ann.start; ln <= ann.end; ln++) {
+            activeLines[ln] = true;
+          }
+        }
+        for (var i = 0; i < lines.length; i++) {
+          var n = parseInt(lines[i].getAttribute('data-line'), 10);
+          if (activeLines[n]) {
+            lines[i].classList.add('codetalk__line--active');
+            lines[i].classList.remove('codetalk__line--dim');
+          } else {
+            lines[i].classList.remove('codetalk__line--active');
+            lines[i].classList.add('codetalk__line--dim');
+          }
+        }
+      }
+
+      updateSpotlight();
+
+      var activeSetObj = {};
+      for (var a = 0; a < activeSet.length; a++) {
+        activeSetObj[activeSet[a]] = true;
+      }
+      for (var i = 0; i < steps.length; i++) {
+        if (activeSetObj[i]) {
+          steps[i].classList.add('codetalk__step--active');
+        } else {
+          steps[i].classList.remove('codetalk__step--active');
+        }
+      }
+
+      positionActiveSteps();
+    }
+
+    // ── Preamble measurement ─────────────────────────────────────
+
+    function measurePreamble() {
+      var file = cur();
+      if (!file) return;
+      var el = file.section.querySelector('.codetalk__preamble');
+      if (!el) { file.preambleBottom = 0; return; }
+      var style = window.getComputedStyle(el);
+      file.preambleBottom = el.offsetTop + el.offsetHeight +
+        (parseFloat(style.marginBottom) || 0);
+    }
+
+    // ── Init ─────────────────────────────────────────────────────
+
+    for (var f = 0; f < files.length; f++) {
+      files[f].lines = Array.prototype.slice.call(
+        files[f].codeInner.querySelectorAll('.codetalk__line')
+      );
+    }
+
+    // ── Spotlight: dim surroundings when annotation is active ─────
+
+    var dimmedElements = [];
+
+    function updateSpotlight() {
+      var file = cur();
+      var hasActive = file && file.activeStepIndices && file.activeStepIndices.length > 0;
+      var shouldDim = fullyInView && hasActive;
+
+      if (shouldDim) {
+        container.classList.add('codetalk--spotlighting');
+        if (!dimmedElements.length) {
+          var parent = container.parentNode;
+          var children = parent ? Array.prototype.slice.call(parent.children) : [];
+          var cwIndex = children.indexOf(container);
+
+          for (var i = 0; i < children.length; i++) {
+            var el = children[i];
+            if (el === container || el.classList.contains('codetalk__preamble') || el.classList.contains('codetalk')) continue;
+
+            var dist = Math.abs(i - cwIndex);
+            var opacity = dist <= 1 ? 0.25 : dist <= 2 ? 0.12 : 0.06;
+            el.style.transition = 'opacity 0.5s ease';
+            el.style.opacity = opacity;
+            el.style.pointerEvents = 'none';
+            dimmedElements.push(el);
+          }
+
+          var nav = document.querySelector('body > nav');
+          var footer = document.querySelector('body > footer');
+          if (nav) {
+            nav.style.transition = 'opacity 0.5s ease';
+            nav.style.opacity = '0.06';
+            nav.style.pointerEvents = 'none';
+            dimmedElements.push(nav);
+          }
+          if (footer) {
+            footer.style.transition = 'opacity 0.5s ease';
+            footer.style.opacity = '0.06';
+            footer.style.pointerEvents = 'none';
+            dimmedElements.push(footer);
+          }
+        }
+      } else {
+        container.classList.remove('codetalk--spotlighting');
+        for (var i = 0; i < dimmedElements.length; i++) {
+          dimmedElements[i].style.opacity = '';
+          dimmedElements[i].style.pointerEvents = '';
+        }
+        dimmedElements = [];
+      }
+    }
+
+    function checkFullyInView() {
+      var rect = container.getBoundingClientRect();
+      var vpHeight = window.innerHeight;
+      var height = rect.height;
+      if (height <= 0) { fullyInView = false; updateSpotlight(); return; }
+
+      var aboveViewport = Math.max(0, -rect.top);
+      var belowViewport = Math.max(0, rect.bottom - vpHeight);
+      var hiddenRatio = (aboveViewport + belowViewport) / height;
+
+      fullyInView = hiddenRatio <= 0.05;
+      updateSpotlight();
+    }
+
+    var scrollTicking = false;
+    window.addEventListener('scroll', function () {
+      if (!scrollTicking) {
+        requestAnimationFrame(function () {
+          checkFullyInView();
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    });
+    checkFullyInView();
+
+    for (var f = 0; f < files.length; f++) {
+      (function (idx) {
+        var ticking = false;
+        files[idx].codeInner.addEventListener('scroll', function () {
+          if (idx !== activeFileIdx) return;
+          if (!ticking) {
+            requestAnimationFrame(function () {
+              checkActiveAnnotation();
+              ticking = false;
+            });
+            ticking = true;
+          }
+        });
+      })(f);
+    }
+
+    switchFile(0);
+
+    // ── Size container to fit tallest file (up to 70vh, min 10 lines) ─
+    var maxCodeContent = 0;
+    var singleLineHeight = 0;
+    for (var f = 0; f < files.length; f++) {
+      var linesEl = files[f].codeInner.querySelector('.codetalk__code-lines');
+      if (linesEl) {
+        maxCodeContent = Math.max(maxCodeContent, linesEl.scrollHeight);
+      }
+      if (!singleLineHeight && files[f].lines.length) {
+        singleLineHeight = files[f].lines[0].offsetHeight;
+      }
+    }
+    var minCodeContent = singleLineHeight * 10;
+    var chrome = container.querySelector('.codetalk__code-area').offsetHeight
+               - files[activeFileIdx].codeInner.clientHeight;
+    var idealHeight = Math.max(maxCodeContent, minCodeContent) + chrome;
+    var maxHeight = window.innerHeight * 0.7;
+    if (idealHeight < maxHeight) {
+      container.style.height = idealHeight + 'px';
+    }
+  }
+})();
+
+  </script>
+</body>
+</html>
+</div>
+
+</div>
+  </div>
+</div>
+
